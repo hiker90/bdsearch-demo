@@ -76,13 +76,14 @@
 		.logo{
 	    	position: fixed;
 	    	top:140px;
-	    	left: 602px;
-			background: url(logo.png) no-repeat;
+	    	left: 601px;
+			background: #000 url(logo.png) no-repeat;
 			-webkit-background-size: cover;
 			background-size: cover;
 			margin: -4px 18px 0 0;
-			height: 127px;
-			width: 127px;
+			height: 129px;
+			width: 129px;
+			box-shadow: 0px 0px 50px 20px #333 inset;
 		}
 		.search-warp{
 	    	float:left;
@@ -115,6 +116,9 @@
 			width: 29px;
 			background: transparent;
 			border: none;
+			color: #fff;
+			font-size: 22px;
+			line-height: 22px;
 		}
 		.search-box{
 			position: absolute;
@@ -181,7 +185,7 @@
 	<div class="search-box" id="search-box">
     	<form class="search-warp" @keydown.enter="return false">
 			<input class="search-input" type="text" v-model="searchTxt" @keyup="get($event)" @keydown.down="move(true)" @keydown.up="move()">
-			<input class="search-submit" type="submit" value="" @click="open()">
+			<input class="search-submit" type="submit" value="搜" @click="open()">
 		</form>
 		<ul id="suggest" class="suggest">
 			<li v-for="(val, index) in sug" :class="{active:index == curSug}" @click="sle(index)">{{val}}</li>
