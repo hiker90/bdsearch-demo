@@ -3,66 +3,71 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <title>Mysearch-搜索</title>
+  	<title>Mysearch-搜索</title>
 	<link id="favicon" href="my_logo.ico" rel="icon"/>
-  <script src="https://cdn.bootcss.com/vue/2.4.4/vue.min.js"></script>
-  <script src="https://cdn.bootcss.com/vue-resource/1.3.4/vue-resource.min.js"></script>
-	<script src="https://cdn.bootcss.com/jquery/3.3.0/jquery.min.js"></script>
-	<script>
-		window.onload=function(){
-			new Vue({
-				el:"#search-box",
-				data:{
-					searchTxt: '',
-					sug: [],
-					curSug: -1
+  	<script src="https://cdn.bootcss.com/vue/2.5.16/vue.min.js"></script>
+  	<script src="https://cdn.bootcss.com/vue-resource/1.5.0/vue-resource.min.js"></script>
+<script>
+	window.onload=function(){
+		new Vue({
+			el:"#search-box",
+			data:{
+				searchTxt: '',
+				sug: [],
+				curSug: -1,
+				isFocused: false
+			},
+			methods:{
+				get:function(e){
+					if(e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
+          				return;
+        			};
+					this.$http.jsonp("https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su",{
+						params:{
+							wd: this.searchTxt
+						},
+						jsonp:"cb"
+					}).then(function(res){
+						this.sug = res.data.s;
+					},function(res){
+						alert(res.status);
+					});
 				},
-				methods:{
-					get:function(e){
-						if(e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) {
-              return;
-            };
-						this.$http.jsonp("https://sp0.baidu.com/5a1Fazu8AA54nxGko9WTAnF6hhy/su",{
-							params:{
-								wd: this.searchTxt
-							},
-							jsonp:"cb"
-						}).then(function(res){
-							this.sug = res.data.s;
-						},function(res){
-							alert(res.status);
-						});
-					},
-					open:function(){
-						window.open("https://www.baidu.com/s?wd="+this.searchTxt);
-					},
-					move:function(dir){
-						if(dir){
-							if(this.curSug < this.sug.length-1){
-								this.searchTxt = this.sug[++this.curSug];
-							}
-						}else{
-							if(this.curSug > 0){
-								this.searchTxt = this.sug[--this.curSug];
-							}
-						};
-					},
-					sle:function(n){
-						this.searchTxt = this.sug[n];
-						window.open("https://www.baidu.com/s?wd="+this.searchTxt);
-					}
-				}
-			});
-			$(".search-input").focus(function(){
-			  $(".logo").addClass("active");
-			});
-			$(".search-input").blur(function(){
-			  $(".logo").removeClass("active");
-			});
-			$(".search-input").trigger("select");
-		}
 
-	</script>
+				open:function(){
+					window.open("https://www.baidu.com/s?wd="+this.searchTxt);
+				},
+				move:function(dir){
+					if(dir){
+						if(this.curSug < this.sug.length-1){
+							this.searchTxt = this.sug[++this.curSug];
+						}
+					}else{
+						if(this.curSug > 0){
+							this.searchTxt = this.sug[--this.curSug];
+						}
+					};
+				},
+				sle:function(n){
+					this.searchTxt = this.sug[n];
+					window.open("https://www.baidu.com/s?wd="+this.searchTxt);
+				},
+				dofocus:function(f){
+					if(f>0){
+						this.isFocused = true;
+					}else{
+						this.isFocused = false;
+					}
+					
+				},
+			},
+			mounted() {
+    			this.$refs['input'].focus()
+  			}
+		});
+	}
+
+</script>
 	<style type="text/css">
 		*{margin: 0;padding: 0;}
 		html, body{
@@ -204,10 +209,10 @@
 </head>
 <body>
 	<div class="bg-div"></div>
-	<div class="logo"></div>
 	<div class="search-box" id="search-box">
-  	<form class="search-warp" @keydown.enter="return false">
-			<input class="search-input" type="text" v-model="searchTxt" @keyup="get($event)" @keydown.down="move(true)" @keydown.up="move()">
+		<div class="logo" :class="{active:isFocused}"></div>
+  		<form class="search-warp" @keydown.enter="return false">
+			<input class="search-input" type="text" v-model="searchTxt" ref="input" @keyup="get($event)" @keydown.down="move(true)" @keydown.up="move()" @focus="dofocus(1)" @blur="dofocus(-1)">
 			<input class="search-submit" type="submit" value="搜" @click="open()">
 		</form>
 		<ul id="suggest" class="suggest">
